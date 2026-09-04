@@ -2,8 +2,8 @@
 // Replace ONLY these two values with the Project URL and Publishable/Anon Key
 // from your Supabase project. Never put a service-role/secret key in this file.
 
-const PROCURA_SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
-const PROCURA_SUPABASE_KEY = "YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY";
+const PROCURA_SUPABASE_URL = "https://jabzegdzovmdbygxjgez.supabase.co";
+const PROCURA_SUPABASE_KEY = "sb_publishable_9XFAKDbCMieQVRVu-qi3Gw_hUC753ct";
 
 (function () {
   const configured =
