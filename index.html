@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROCURA | Intelligent Agricultural Procurement Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- =========================================================
+     LANDING PAGE
+     ========================================================= -->
+<section id="view-landing" class="view landing">
+  <div class="landing-bg"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">P</span>
+      <span class="brand-name">PROCURA</span>
+    </div>
+    <div class="brand-tagline">Predict. Coordinate. Procure.</div>
+  </header>
+
+  <div class="landing-hero">
+    <h1>Real-time visibility<br>into every procurement centre.</h1>
+    <p class="lede">Reduce waiting time. Balance procurement capacity. Track every stage — from the field to the farmer's payment.</p>
+
+    <div class="portal-grid">
+      <button class="portal-card" onclick="Router.go('farmer-login')">
+        <span class="portal-icon">🌾</span>
+        <span class="portal-title">Farmer Portal</span>
+        <span class="portal-desc">Book a slot, get a token, track produce and payment.</span>
+      </button>
+      <button class="portal-card" onclick="Router.go('centre-login')">
+        <span class="portal-icon">🏢</span>
+        <span class="portal-title">Procurement Centre</span>
+        <span class="portal-desc">Manage queue, capacity, weighing and payments.</span>
+      </button>
+      <button class="portal-card" onclick="Router.go('officer-login')">
+        <span class="portal-icon">🛰️</span>
+        <span class="portal-title">Officer Dashboard</span>
+        <span class="portal-desc">Monitor every centre and the district-wide load.</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="landing-strip">
+    <div><strong id="strip-centres">3</strong><span>Active centres</span></div>
+    <div><strong id="strip-waiting">—</strong><span>Farmers waiting now</span></div>
+    <div><strong id="strip-capacity">—</strong><span>Network capacity used</span></div>
+  </div>
+</section>
+
+<!-- =========================================================
+     FARMER LOGIN
+     ========================================================= -->
+<section id="view-farmer-login" class="view auth hidden">
+  <div class="auth-card">
+    <button class="back-link" onclick="Router.go('landing')">← Back</button>
+    <span class="auth-icon">🌾</span>
+    <h2>Farmer Login</h2>
+    <p class="auth-sub">Enter your registered mobile number and location.</p>
+
+    <form onsubmit="Auth.loginFarmer(event)">
+      <label>Mobile Number</label>
+      <input id="farmerMobile" type="tel" placeholder="10-digit mobile number" required>
+
+      <label>Location</label>
+      <input id="farmerLocation" type="text" placeholder="e.g. Hyderabad" required>
+
+      <button type="submit" class="btn-primary btn-block">Login →</button>
+    </form>
+
+    <div class="demo-box">
+      <strong>Demo farmer accounts</strong>
+      <p>Ravi Kumar — 9876543210 — Hyderabad</p>
+      <p>Suresh Reddy — 9876543211 — Hyderabad</p>
+      <p>Anitha Devi — 9876543212 — Hyderabad</p>
+      <p>Mahesh Kumar — 9876543213 — Hyderabad</p>
+      <p>Lakshmi — 9876543214 — Hyderabad</p>
+      <p>Priya — 9876543215 — Hyderabad</p>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     CENTRE LOGIN
+     ========================================================= -->
+<section id="view-centre-login" class="view auth hidden">
+  <div class="auth-card">
+    <button class="back-link" onclick="Router.go('landing')">← Back</button>
+    <span class="auth-icon">🏢</span>
+    <h2>Procurement Centre Login</h2>
+    <p class="auth-sub">Enter your centre ID and password.</p>
+
+    <form onsubmit="Auth.loginCentre(event)">
+      <label>Centre ID</label>
+      <input id="centreId" type="text" placeholder="e.g. PC-TG-00427" required>
+
+      <label>Password</label>
+      <input id="centrePassword" type="password" placeholder="Password" required>
+
+      <button type="submit" class="btn-primary btn-block">Login →</button>
+    </form>
+
+    <div class="demo-box">
+      <strong>Demo centre accounts</strong>
+      <p>PC-TG-00427 / Procura@123 — ABC Procurement Centre</p>
+      <p>PC-TG-00428 / Procura@456 — GreenField Procurement Centre</p>
+      <p>PC-TG-00429 / Procura@789 — RuralAgri Procurement Centre</p>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     OFFICER LOGIN
+     ========================================================= -->
+<section id="view-officer-login" class="view auth hidden">
+  <div class="auth-card">
+    <button class="back-link" onclick="Router.go('landing')">← Back</button>
+    <span class="auth-icon">🛰️</span>
+    <h2>Officer Login</h2>
+    <p class="auth-sub">District Procurement Officer access.</p>
+
+    <form onsubmit="Auth.loginOfficer(event)">
+      <label>Phone Number</label>
+      <input id="officerPhone" type="tel" placeholder="Phone number" required>
+
+      <label>Password</label>
+      <input id="officerPassword" type="password" placeholder="Password" required>
+
+      <button type="submit" class="btn-primary btn-block">Login →</button>
+    </form>
+
+    <div class="demo-box">
+      <strong>Demo officer account</strong>
+      <p>9000012345 / Officer@123</p>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     FARMER DASHBOARD
+     ========================================================= -->
+<section id="view-farmer-dash" class="view dash hidden">
+  <nav class="dashnav">
+    <div class="brand"><span class="brand-mark">P</span><span class="brand-name">PROCURA</span></div>
+    <div class="dashnav-tabs">
+      <button class="tab-btn active" data-tab="f-overview" onclick="FarmerUI.tab('f-overview')">Overview</button>
+      <button class="tab-btn" data-tab="f-book" onclick="FarmerUI.tab('f-book')">Book a Slot</button>
+      <button class="tab-btn" data-tab="f-track" onclick="FarmerUI.tab('f-track')">Produce & Payment</button>
+    </div>
+    <button class="btn-ghost" onclick="Auth.logout()">Logout</button>
+  </nav>
+
+  <div class="dash-body">
+    <!-- OVERVIEW -->
+    <div id="f-overview" class="tab-pane">
+      <div class="pane-head">
+        <div>
+          <span class="eyebrow">Farmer Portal</span>
+          <h1>Welcome, <span id="fw-name">—</span></h1>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <span class="stat-label">Location</span>
+          <strong id="fw-location">—</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Active Bookings</span>
+          <strong id="fw-bookings-count">0</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Payment Status</span>
+          <strong id="fw-payment-status">—</strong>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Current Booking</h2>
+        <div id="fw-current-booking"><p class="muted">No active booking. Head to "Book a Slot" to get started.</p></div>
+      </div>
+
+    </div>
+
+    <!-- BOOK -->
+    <div id="f-book" class="tab-pane hidden">
+      <div class="pane-head">
+        <span class="eyebrow">Step 1</span>
+        <h1>Select Your Crop</h1>
+      </div>
+
+      <div class="crop-grid" id="crop-grid"></div>
+
+      <div id="centre-recommend-area" class="hidden">
+        <div class="pane-head" style="margin-top:36px;">
+          <span class="eyebrow">Step 2</span>
+          <h1>Available Procurement Centres</h1>
+          <p class="muted">Ranked using live capacity, queue, congestion and distance data.</p>
+        </div>
+        <div id="centre-list"></div>
+      </div>
+
+      <div id="slot-booking-area" class="hidden">
+        <div class="pane-head" style="margin-top:36px;">
+          <span class="eyebrow">Step 3</span>
+          <h1>Book Your Slot</h1>
+        </div>
+        <div class="panel" id="slot-form-panel"></div>
+      </div>
+
+      <div id="booking-confirm-area" class="hidden"></div>
+    </div>
+
+    <!-- TRACK -->
+    <div id="f-track" class="tab-pane hidden">
+      <div class="pane-head">
+        <span class="eyebrow">Produce Tracking</span>
+        <h1>Status & Payment</h1>
+      </div>
+      <div id="track-content"></div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     CENTRE DASHBOARD
+     ========================================================= -->
+<section id="view-centre-dash" class="view dash hidden">
+  <nav class="dashnav">
+    <div class="brand"><span class="brand-mark">P</span><span class="brand-name">PROCURA</span></div>
+    <div class="dashnav-tabs">
+      <button class="tab-btn active" data-tab="c-overview" onclick="CentreUI.tab('c-overview')">Overview</button>
+      <button class="tab-btn" data-tab="c-queue" onclick="CentreUI.tab('c-queue')">Farmer Queue</button>
+      <button class="tab-btn" data-tab="c-settings" onclick="CentreUI.tab('c-settings')">Update Centre</button>
+    </div>
+    <button class="btn-ghost" onclick="Auth.logout()">Logout</button>
+  </nav>
+
+  <div class="dash-body">
+    <div id="c-overview" class="tab-pane">
+      <div class="pane-head">
+        <div>
+          <span class="eyebrow" id="cw-id">—</span>
+          <h1 id="cw-name">—</h1>
+          <p class="muted" id="cw-location">—</p>
+        </div>
+        <span class="status-pill" id="cw-status">—</span>
+      </div>
+
+      <div class="stat-row" id="centre-metrics"></div>
+
+      <div class="panel">
+        <h2>Capacity</h2>
+        <div class="bar-track"><div class="bar-fill" id="c-capacity-fill"></div></div>
+        <p class="muted" id="c-capacity-text">—</p>
+      </div>
+
+      <div class="panel-grid-2">
+        <div class="panel">
+          <h2>Now Processing</h2>
+          <div id="c-now-processing"><p class="muted">No farmer currently called.</p></div>
+        </div>
+        <div class="panel">
+          <h2>Predicted Peak (next 2 hrs)</h2>
+          <div id="c-predicted"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="c-queue" class="tab-pane hidden">
+      <div class="pane-head"><h1>Farmer Queue</h1></div>
+      <div class="table-wrap">
+        <table class="data-table" id="c-queue-table">
+          <thead><tr><th>Token</th><th>Farmer</th><th>Crop</th><th>Measured Qty</th><th>Slot</th><th>Status</th><th>Produce Status</th><th>Actions</th></tr></thead>
+          <tbody id="c-queue-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="c-settings" class="tab-pane hidden">
+      <div class="pane-head"><h1>Update Centre Data</h1><p class="muted">Changes here propagate instantly to Farmer and Officer dashboards.</p></div>
+      <div class="panel" id="c-settings-form"></div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     OFFICER DASHBOARD
+     ========================================================= -->
+<section id="view-officer-dash" class="view dash hidden">
+  <nav class="dashnav">
+    <div class="brand"><span class="brand-mark">P</span><span class="brand-name">PROCURA</span></div>
+    <div class="dashnav-tabs">
+      <button class="tab-btn active" data-tab="o-overview" onclick="OfficerUI.tab('o-overview')">Overview</button>
+      <button class="tab-btn" data-tab="o-network" onclick="OfficerUI.tab('o-network')">Network Status</button>
+      <button class="tab-btn" data-tab="o-recommend" onclick="OfficerUI.tab('o-recommend')">Recommendations</button>
+      <button class="tab-btn" data-tab="o-predict" onclick="OfficerUI.tab('o-predict')">Predictions</button>
+      <button class="tab-btn" data-tab="o-analytics" onclick="OfficerUI.tab('o-analytics')">Analytics</button>
+      <button class="tab-btn" data-tab="o-payments" onclick="OfficerUI.tab('o-payments')">Payment Issues</button>
+    </div>
+    <button class="btn-ghost" onclick="Auth.logout()">Logout</button>
+  </nav>
+
+  <div class="dash-body">
+    <div id="o-overview" class="tab-pane">
+      <div class="pane-head">
+        <span class="eyebrow">District Procurement Officer</span>
+        <h1>Network Overview</h1>
+      </div>
+      <div class="stat-row" id="officer-stats"></div>
+      <div class="panel">
+        <h2 id="o-waiting-headline">—</h2>
+        <div id="o-crowd-compare"></div>
+      </div>
+    </div>
+
+    <div id="o-network" class="tab-pane hidden">
+      <div class="pane-head"><h1>Procurement Network Status</h1></div>
+      <div id="o-network-cards"></div>
+    </div>
+
+    <div id="o-recommend" class="tab-pane hidden">
+      <div class="pane-head"><h1>Smart Recommendations</h1><p class="muted">"Don't wait for the queue to form. Predict it before it happens."</p></div>
+      <div id="o-recommend-cards"></div>
+    </div>
+
+    <div id="o-predict" class="tab-pane hidden">
+      <div class="pane-head"><h1>Prediction Section</h1></div>
+      <div id="o-predict-cards"></div>
+    </div>
+
+    <div id="o-analytics" class="tab-pane hidden">
+      <div class="pane-head"><h1>Analytics</h1></div>
+      <div id="o-analytics-content"></div>
+    </div>
+
+    <div id="o-payments" class="tab-pane hidden">
+      <div class="pane-head"><h1>Payment Issues</h1></div>
+      <div id="o-payments-content"></div>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
