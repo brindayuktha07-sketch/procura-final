@@ -242,14 +242,17 @@ const STORAGE_KEY = "procura_shared_state_v1";
 const Storage = {
   snapshot() {
     return {
-      centres: State.centres,
-      farmers: State.farmers,
-      paymentIssues: State.paymentIssues,
-      historicalData: State.historicalData,
-      tokenCounter: State.tokenCounter,
-      bookingCounter: State.bookingCounter,
-      issueCounter: State.issueCounter
-    };
+  centres: State.centres,
+  farmers: State.farmers,
+  paymentIssues: State.paymentIssues,
+  historicalData: State.historicalData,
+  tokenCounter: State.tokenCounter,
+  bookingCounter: State.bookingCounter,
+  issueCounter: State.issueCounter,
+
+  // Keep the booking confirmation after a re-render/reload
+  bookingConfirmationVisible: State.bookingConfirmationVisible
+};
   },
 
   async save() {
@@ -309,6 +312,8 @@ const Storage = {
     State.tokenCounter = data.tokenCounter ?? State.tokenCounter;
     State.bookingCounter = data.bookingCounter ?? State.bookingCounter;
     State.issueCounter = data.issueCounter ?? State.issueCounter;
+    State.bookingConfirmationVisible =
+  data.bookingConfirmationVisible ?? false;
   },
 
   // Re-render whichever screen is currently open so a change made in
@@ -492,42 +497,19 @@ const FarmerUI = {
         <span class="crop-emoji">${CROP_EMOJI[c]}</span>${c}
       </button>`).join("");
 
-   document.getElementById("centre-recommend-area")
-  .classList.toggle("hidden", !State.selectedCrop);
-
-const slotArea = document.getElementById("slot-booking-area");
-const confirmArea = document.getElementById("booking-confirm-area");
-
-if (State.selectedCentreId) {
-  slotArea.classList.remove("hidden");
-} else {
-  slotArea.classList.add("hidden");
-}
-
-if (State.bookingConfirmationVisible) {
-  confirmArea.classList.remove("hidden");
-} else {
-  confirmArea.classList.add("hidden");
-  confirmArea.innerHTML = "";
-}
-
-if (State.selectedCrop) this.renderCentreList();
-     
+    document.getElementById("centre-recommend-area").classList.toggle("hidden", !State.selectedCrop);
+    document.getElementById("slot-booking-area").classList.add("hidden");
+    document.getElementById("booking-confirm-area").classList.add("hidden");
+    document.getElementById("booking-confirm-area").innerHTML = "";
 
     if (State.selectedCrop) this.renderCentreList();
   },
 
- pickCrop(crop) {
-  State.selectedCrop = crop;
-  State.selectedCentreId = null;
-  State.bookingConfirmationVisible = false;
-
-  document.getElementById("slot-booking-area").classList.add("hidden");
-  document.getElementById("booking-confirm-area").classList.add("hidden");
-  document.getElementById("booking-confirm-area").innerHTML = "";
-
-  this.renderBook();
-},
+  pickCrop(crop) {
+    State.selectedCrop = crop;
+    State.selectedCentreId = null;
+    this.renderBook();
+  },
 
   renderCentreList() {
     const crop = State.selectedCrop;
@@ -710,6 +692,7 @@ if (State.selectedCrop) this.renderCentreList();
     Utils.toast(isGroup ? `${groupSize} tokens booked at ${centre.name}` : `Token ${newTokens[0]} booked at ${centre.name}`, "success");
     document.getElementById("slot-booking-area").classList.add("hidden");
     State.selectedCentreId = null;
+    State.bookingConfirmationVisible = true;
     Storage.save();
   },
 
