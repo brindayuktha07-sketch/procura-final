@@ -492,19 +492,42 @@ const FarmerUI = {
         <span class="crop-emoji">${CROP_EMOJI[c]}</span>${c}
       </button>`).join("");
 
-    document.getElementById("centre-recommend-area").classList.toggle("hidden", !State.selectedCrop);
-    document.getElementById("slot-booking-area").classList.add("hidden");
-    document.getElementById("booking-confirm-area").classList.add("hidden");
-    document.getElementById("booking-confirm-area").innerHTML = "";
+   document.getElementById("centre-recommend-area")
+  .classList.toggle("hidden", !State.selectedCrop);
+
+const slotArea = document.getElementById("slot-booking-area");
+const confirmArea = document.getElementById("booking-confirm-area");
+
+if (State.selectedCentreId) {
+  slotArea.classList.remove("hidden");
+} else {
+  slotArea.classList.add("hidden");
+}
+
+if (State.bookingConfirmationVisible) {
+  confirmArea.classList.remove("hidden");
+} else {
+  confirmArea.classList.add("hidden");
+  confirmArea.innerHTML = "";
+}
+
+if (State.selectedCrop) this.renderCentreList();
+     
 
     if (State.selectedCrop) this.renderCentreList();
   },
 
-  pickCrop(crop) {
-    State.selectedCrop = crop;
-    State.selectedCentreId = null;
-    this.renderBook();
-  },
+ pickCrop(crop) {
+  State.selectedCrop = crop;
+  State.selectedCentreId = null;
+  State.bookingConfirmationVisible = false;
+
+  document.getElementById("slot-booking-area").classList.add("hidden");
+  document.getElementById("booking-confirm-area").classList.add("hidden");
+  document.getElementById("booking-confirm-area").innerHTML = "";
+
+  this.renderBook();
+},
 
   renderCentreList() {
     const crop = State.selectedCrop;
