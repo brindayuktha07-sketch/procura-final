@@ -242,62 +242,31 @@ const STORAGE_KEY = "procura_shared_state_v1";
 const Storage = {
   snapshot() {
     return {
-  centres: State.centres,
-  farmers: State.farmers,
-  paymentIssues: State.paymentIssues,
-  historicalData: State.historicalData,
-  tokenCounter: State.tokenCounter,
-  bookingCounter: State.bookingCounter,
-  issueCounter: State.issueCounter,
-
-  // Keep the booking confirmation after a re-render/reload
-  bookingConfirmationVisible: State.bookingConfirmationVisible
-};
+      centres: State.centres,
+      farmers: State.farmers,
+      paymentIssues: State.paymentIssues,
+      historicalData: State.historicalData,
+      tokenCounter: State.tokenCounter,
+      bookingCounter: State.bookingCounter,
+      issueCounter: State.issueCounter
+    };
   },
 
-  async save() {
-    const snapshot = this.snapshot();
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot)); } catch (e) { /* storage unavailable */ }
-
-    // Persist the same shared state to Supabase when configured.
-    if (window.ProcuraCloud && window.ProcuraCloud.enabled) {
-      try {
-        await window.ProcuraCloud.save(snapshot);
-      } catch (e) {
-        console.warn("PROCURA cloud save failed:", e);
-      }
-    }
+  save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(this.snapshot())); } catch (e) { /* storage unavailable */ }
   },
 
   // Merge stored data into existing objects (rather than replacing arrays
   // outright) so any reference already held onto — e.g. State.currentCentre —
   // keeps pointing at the same object, now carrying the freshest data.
-  async load(options = {}) {
-    let data = null;
+  load() {
+    let raw;
+    try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { return; }
+    if (!raw) { this.save(); return; }
 
-    // Prefer the cloud copy when Supabase is configured.
-    if (window.ProcuraCloud && window.ProcuraCloud.enabled) {
-      try {
-        data = await window.ProcuraCloud.load();
-      } catch (e) {
-        console.warn("PROCURA cloud load failed; using local data:", e);
-      }
-    }
-
-    // Fall back to localStorage if the cloud has no snapshot yet.
-    if (!data) {
-      let raw;
-      try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { raw = null; }
-      if (raw) {
-        try { data = JSON.parse(raw); } catch (e) { data = null; }
-      }
-    }
-
-    // First run: seed the cloud/local store with the built-in demo state.
-    if (!data) {
-      await this.save();
-      return;
-    }
+    let data;
+    try { data = JSON.parse(raw); } catch (e) { return; }
+    if (!data) return;
 
     (data.centres || []).forEach(loaded => {
       const existing = State.centres.find(c => c.id === loaded.id);
@@ -312,8 +281,6 @@ const Storage = {
     State.tokenCounter = data.tokenCounter ?? State.tokenCounter;
     State.bookingCounter = data.bookingCounter ?? State.bookingCounter;
     State.issueCounter = data.issueCounter ?? State.issueCounter;
-    State.bookingConfirmationVisible =
-  data.bookingConfirmationVisible ?? false;
   },
 
   // Re-render whichever screen is currently open so a change made in
@@ -692,7 +659,6 @@ const FarmerUI = {
     Utils.toast(isGroup ? `${groupSize} tokens booked at ${centre.name}` : `Token ${newTokens[0]} booked at ${centre.name}`, "success");
     document.getElementById("slot-booking-area").classList.add("hidden");
     State.selectedCentreId = null;
-    State.bookingConfirmationVisible = true;
     Storage.save();
   },
 
@@ -1335,25 +1301,7 @@ const OfficerUI = {
    INIT
    ============================================================= */
 
-document.addEventListener("DOMContentLoaded", async () => {
-  await Storage.load();
+document.addEventListener("DOMContentLoaded", () => {
+  Storage.load();
   Landing.render();
-
-  // Keep different devices/tabs reasonably fresh without requiring a refresh.
-  if (window.ProcuraCloud && window.ProcuraCloud.enabled) {
-    setInterval(async () => {
-      try {
-        const cloud = await window.ProcuraCloud.load();
-        if (!cloud) return;
-        const before = JSON.stringify(Storage.snapshot());
-        const current = JSON.stringify(cloud);
-        if (before !== current) {
-          await Storage.load({ silent: true });
-          Storage.refreshVisibleView();
-        }
-      } catch (e) {
-        console.warn("PROCURA cloud refresh failed:", e);
-      }
-    }, 5000);
-  }
 });
